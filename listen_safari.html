@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <title>Agora Listener</title>
+  <script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.20.0.js"></script>
+</head>
+<body>
+  <h2>🎧 Agora Listener (Safari OK)</h2>
+
+  <button id="startBtn" style="font-size:18px;padding:10px">
+    ▶️ Start Listening
+  </button>
+
+  <script>
+    const APP_ID = "ab85ca3f38ba4c86b86d811314e00112";
+    const CHANNEL = "testStream";
+
+    const client = AgoraRTC.createClient({
+      mode: "live",
+      codec: "h264"
+    });
+
+    async function start() {
+      await client.setClientRole("audience");
+      await client.join(APP_ID, CHANNEL, null, null);
+
+      client.on("user-published", async (user, mediaType) => {
+        await client.subscribe(user, mediaType);
+        if (mediaType === "audio") {
+          user.audioTrack.play();
+        }
+      });
+    }
+
+    document.getElementById("startBtn").onclick = async () => {
+      await AgoraRTC.resumeAudioContext();
+      await start();
+      document.getElementById("startBtn").remove();
+    };
+  </script>
+</body>
+</html>
